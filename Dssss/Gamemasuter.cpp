@@ -1,5 +1,5 @@
 ﻿#include "Gamemaster.hpp"
-Gamemastar::Gamemastar(Array<Player*> ps,bool log) {
+Gamemastar::Gamemastar(Array<Player*> ps,int32 log) {
 	pack = Pack{ 75, Palette::Red };
 	players = ps;
 	playercard = Array<Array<Card>>(4, Array<Card>());
@@ -82,7 +82,7 @@ void Gamemastar::progress() {
 	int e = events.setcard(action);
 	if (e == -1 or not usecard(nowturn, action)) {
 		finish[nowturn] = -1000+nowturn;
-		printlog( U"Player{} 反則負け(ターン{})"_fmt(players[nowturn]->getname(), countturn),3);
+		printlog( U"Player{} 反則負け(ターン{})(カード{}:{})"_fmt(players[nowturn]->getname(), countturn, action[0].suit,action[0].rank), 3);
 	}
 	if (e == 1)printlog(U"スート縛り発生(ターン{})"_fmt(countturn), 2);
 	if (e == 2)printlog(U"複数枚出し縛り発生(ターン{})"_fmt(countturn), 2);
@@ -101,7 +101,7 @@ void Gamemastar::progress() {
 	if (playercard[nowturn].size() <= 0) {
 		if (events.ishansoku(action)) {
 			finish[nowturn] = -1000 + countturn;
-			printlog(U"Player{} 反則上がり!(ターン{})"_fmt(players[nowturn]->getname(), countturn), 3);
+			printlog(U"Player{} 反則上がり!(ターン{})(カード{}:{})"_fmt(players[nowturn]->getname(), countturn, action[0].suit, action[0].rank), 3);
 		}
 		else {
 			finish[nowturn] = 1000 - countturn;
@@ -196,6 +196,7 @@ Array<int32> Gamemastar::setranking(Array<int32> fin) {
 void Gamemastar::printlog(String str, int32 logLv) {
 	if (logLv > loglv) {
 		Print << str;
+		Logger << str;
 	}
 }
 int32  Gamemastar::countplayer(int32 c) {

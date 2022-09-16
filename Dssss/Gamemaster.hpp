@@ -5,7 +5,7 @@
 using namespace PlayingCard;
 class  Gamemastar {
 public:
-	Gamemastar(Array<Player*> ps,bool log=0);
+	Gamemastar(Array<Player*> ps,int32 log=0);
 	//山札を作る
 	void makeyamafuda(bool setblind = false);
 	//ゲームのメイキング
@@ -24,7 +24,7 @@ private:
 	bool usecard(int who, Card card);
 	Array<int32> setranking(Array<int32> fin);
 	int32 countplayer(int32 c);
-	void printlog(String str,int logLv=1);
+	void printlog(String str,int32 logLv=1);
 	Pack pack;
 	GameEvent events;
 	int32 gamecount = 4;
@@ -41,4 +41,5 @@ private:
 	Array<int32> finish;
 	int32 loglv;
 	const Array<String> rankname{ U"大富豪",U"富豪", U"貧民", U"大貧民" };
+	//const Array<String> mark{ U"♠",U"♡",U"♢",U"♣",U"J"};
 };

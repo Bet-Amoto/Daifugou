@@ -53,6 +53,7 @@ public:
 private:
 };
 
+
 void Main()
 {
 	//ここでプレイヤーの登録
@@ -62,15 +63,52 @@ void Main()
 	const double cooltime = 0.2;
 
 	//2つめの引数の数字を変えるとlogの量を調整できるよ(0-3) 0はすべてのlog、3はlogなし
-	Gamemastar mastar(players,1);
+	Gamemastar mastar(players,100);
+
+	const bool bakusoku = true;
 
 	Window::Resize(1280, 720);
 	Scene::SetBackground(Palette::Darkgreen);
 	const Array<String> rankname{ U"大富豪",U"富豪", U"貧民", U"大貧民" };
+	const Array<int32> rankscore{ 6, 4, 2, 0 };
+	Array<int32> playerscore(4,0);
 	mastar.initgame();
 	double t = 0;
+	int32 gamecount = 0;
 	while (System::Update())
 	{
+
+		if (bakusoku) {
+			if (gamecount > 5000)continue;
+			String logstr;
+			for (auto _ : step(4)) {
+				while (not mastar.isfinish()) {
+					mastar.progress();
+				}
+				logstr = U"";
+				Array<Player*> ranking = mastar.getRanking();
+				Array<String> tmpp(4, U"");
+				for (auto p : step(ranking.size())) {
+					auto itr = find(players.begin(), players.end(), ranking[p]);
+					int32 who = distance(players.begin(), itr);
+					playerscore[who] += rankscore[p];
+					tmpp[who] = U"{}:{}  "_fmt(ranking[p]->getname(), playerscore[who]);
+				}
+				for (auto s : tmpp)logstr += s;
+				if (gamecount % 100 == 0)Logger << U"game{}... "_fmt(gamecount) + logstr;
+				mastar.initgame();
+				gamecount++;
+			}
+			ClearPrint();
+			Print << U"ゲーム数:{}"_fmt(gamecount);
+			if (gamecount > 5000) {
+				Logger << U"Finish!";
+				Print << U"Finish!";
+				Print << logstr;
+			}
+			continue;
+		}
+
 		t += Scene::DeltaTime();
 		if (t > cooltime) {
 			if (mastar.isfinish()) {
@@ -78,7 +116,10 @@ void Main()
 				Print << U"ゲームが終了しました";
 				Array<Player*> ranking = mastar.getRanking();
 				for (auto p : step(ranking.size())) {
-					Print << U"{}:{}"_fmt(rankname[p], ranking[p]->getname());
+					auto itr = find(players.begin(), players.end(), ranking[p]);
+					int32 who = distance(players.begin(), itr);
+					playerscore[who] += rankscore[p];
+					Print << U"{}:{}(現在{}点)"_fmt(rankname[p], ranking[p]->getname(),playerscore[who]);
 				}
 				mastar.initgame();
 				t = 0; continue;

@@ -196,8 +196,8 @@ bool GameEvent::ishansoku(Array<Card> cards) const {
 	if (ismulti(cards) and cards[0].rank == 8)return true;
 	for (auto c : cards) {
 		if (c.suit == Suit::Joker)return true;
-		if (iskakumei() and c.suit == 3)return true;
-		if (not iskakumei() and c.suit == 2)return true;
+		if (iskakumei() and c.rank == 3)return true;
+		if (not iskakumei() and c.rank == 2)return true;
 	}
 	return false;
 }
