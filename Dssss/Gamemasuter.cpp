@@ -1,11 +1,12 @@
 ﻿#include "Gamemaster.hpp"
-Gamemastar::Gamemastar(Array<Player*> ps) {
+Gamemastar::Gamemastar(Array<Player*> ps,bool log) {
 	pack = Pack{ 75, Palette::Red };
 	players = ps;
 	playercard = Array<Array<Card>>(4, Array<Card>());
 	makeyamafuda(true);
 	ranking = Array<int32>{ 0,1,2,3 };
 	font = Font(20);
+	loglv = log;
 }
 //山札を作る
 void Gamemastar::makeyamafuda(bool setblind) {
@@ -81,43 +82,43 @@ void Gamemastar::progress() {
 	int e = events.setcard(action);
 	if (e == -1 or not usecard(nowturn, action)) {
 		finish[nowturn] = -1000+nowturn;
-		Print << U"Player{} 反則負け(ターン{})"_fmt(players[nowturn]->getname(), countturn);
+		printlog( U"Player{} 反則負け(ターン{})"_fmt(players[nowturn]->getname(), countturn),3);
 	}
-	if (e == 1)Print << U"スート縛り発生(ターン{})"_fmt(countturn);
-	if (e == 2)Print << U"複数枚出し縛り発生(ターン{})"_fmt(countturn);
-	if (e == 3)Print << U"階段縛り発生(ターン{})"_fmt(countturn);
-	if (e == 4)Print << U"革命発生(ターン{})"_fmt(countturn);
+	if (e == 1)printlog(U"スート縛り発生(ターン{})"_fmt(countturn), 2);
+	if (e == 2)printlog(U"複数枚出し縛り発生(ターン{})"_fmt(countturn), 2);
+	if (e == 3)printlog(U"階段縛り発生(ターン{})"_fmt(countturn), 2);
+	if (e == 4)printlog(U"革命発生(ターン{})"_fmt(countturn), 2);
 	if (e == 100) {
-		Print << U"Player{} パス(ターン{})"_fmt(players[nowturn]->getname(), countturn);
+		printlog(U"Player{} パス(ターン{})"_fmt(players[nowturn]->getname(), countturn));
 		passcount++;
 	}
 	else passcount = 0;
 	if (passcount >= countplayer(0) - 1) {
 		events.restart();
-		Print << U"パスが続いたため場が流れます(ターン{})"_fmt(countturn);
+		printlog(U"パスが続いたため場が流れます(ターン{})"_fmt(countturn));
 		passcount = 0;
 	}
 	if (playercard[nowturn].size() <= 0) {
 		if (events.ishansoku(action)) {
 			finish[nowturn] = -1000 + countturn;
-			Print<< U"Player{} 反則上がり!ばーーーーか！！！！(ターン{})"_fmt(players[nowturn]->getname(), countturn);
+			printlog(U"Player{} 反則上がり!(ターン{})"_fmt(players[nowturn]->getname(), countturn), 3);
 		}
 		else {
 			finish[nowturn] = 1000 - countturn;
-			Print << U"Player{} 勝ち抜け(ターン{})"_fmt(players[nowturn]->getname(), countturn);
+			printlog( U"Player{} 勝ち抜け(ターン{})"_fmt(players[nowturn]->getname(), countturn), 3);
 			if (gamecount != 1 and finish[ranking[0]] == 0) {
-				Print << U"Player{} 都落としにより脱落(ターン{})"_fmt(players[ranking[0]]->getname(), countturn);
+				printlog(U"Player{} 都落としにより脱落(ターン{})"_fmt(players[ranking[0]]->getname(), countturn), 3);
 				finish[ranking[0]] = -10;
 			}
 		}
 	}
 	if (events.isyagiri()) {
-		Print << U"Player{} 8切り発動(ターン{})"_fmt(players[nowturn]->getname(), countturn);
+		printlog(U"Player{} 8切り発動(ターン{})"_fmt(players[nowturn]->getname(), countturn),2);
 		nowturn--;
 		events.restart();
 	}
 	if (events.issupesan()) {
-		Print << U"Player{} スぺ3返し!(ターン{})"_fmt(players[nowturn]->getname(), countturn);
+		printlog(U"Player{} スぺ3返し!(ターン{})"_fmt(players[nowturn]->getname(), countturn),2);
 		nowturn--;
 		events.restart();
 	}
@@ -191,6 +192,11 @@ Array<int32> Gamemastar::setranking(Array<int32> fin) {
 		ran << pos;
 	}
 	return ran;
+}
+void Gamemastar::printlog(String str, int32 logLv) {
+	if (logLv > loglv) {
+		Print << str;
+	}
 }
 int32  Gamemastar::countplayer(int32 c) {
 	int co = 0;

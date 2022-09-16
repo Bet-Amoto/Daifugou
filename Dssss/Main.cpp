@@ -33,6 +33,7 @@ public:
 private:
 };
 
+
 class mybot :public Player {
 public:
 	mybot() :Player(U"MyBot") {};
@@ -54,13 +55,19 @@ private:
 
 void Main()
 {
+	//ここでプレイヤーの登録
+	Array<Player*> players{ (new mybot()),(new randombot()) ,(new randombot()) ,(new randombot()) };
+
+	//ここの数字を小さくすると試合の進行が速くなるよ
+	const double cooltime = 0.2;
+
+	//2つめの引数の数字を変えるとlogの量を調整できるよ(0-3) 0はすべてのlog、3はlogなし
+	Gamemastar mastar(players,1);
+
 	Window::Resize(1280, 720);
 	Scene::SetBackground(Palette::Darkgreen);
 	const Array<String> rankname{ U"大富豪",U"富豪", U"貧民", U"大貧民" };
-	Array<Player*> players{ (new mybot()),(new randombot()) ,(new randombot()) ,(new randombot()) };
-	Gamemastar mastar(players);
 	mastar.initgame();
-	const double cooltime = 1;
 	double t = 0;
 	while (System::Update())
 	{
