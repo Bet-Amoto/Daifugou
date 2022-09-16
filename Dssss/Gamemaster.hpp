@@ -22,6 +22,7 @@ private:
 	bool ishave(int who, Card card);
 	bool usecard(int who, Array<Card> cards);
 	bool usecard(int who, Card card);
+	Array<int32> setranking(Array<int32> fin);
 	int32 countplayer(int32 c);
 
 	Pack pack;

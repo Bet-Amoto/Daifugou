@@ -80,10 +80,8 @@ void Gamemastar::progress() {
 	Array<Card> action = players[nowturn]->action(events, playercard[nowturn]);
 	int e = events.setcard(action);
 	if (e == -1 or not usecard(nowturn, action)) {
-		finish[nowturn] = -1;
-		ranking[4 - countplayer(-1)] = nowturn;
-		Print << U"Player{} 反則負け(ランク:{} ターン{})"_fmt(players[nowturn]->getname(), rankname[4 - countplayer(-1)], countturn);
-		return;
+		finish[nowturn] = -1000+nowturn;
+		Print << U"Player{} 反則負け(ターン{})"_fmt(players[nowturn]->getname(), countturn);
 	}
 	if (e == 1)Print << U"スート縛り発生(ターン{})"_fmt(countturn);
 	if (e == 2)Print << U"複数枚出し縛り発生(ターン{})"_fmt(countturn);
@@ -100,9 +98,18 @@ void Gamemastar::progress() {
 		passcount = 0;
 	}
 	if (playercard[nowturn].size() <= 0) {
-		finish[nowturn] = 1;
-		ranking[countplayer(1) - 1] = nowturn;
-		Print << U"Player{} 勝ち抜け(ランク:{} ターン{})"_fmt(players[nowturn]->getname(), rankname[countplayer(1) - 1], countturn);
+		if (events.ishansoku(action)) {
+			finish[nowturn] = -1000 + countturn;
+			Print<< U"Player{} 反則上がり!ばーーーーか！！！！(ターン{})"_fmt(players[nowturn]->getname(), countturn);
+		}
+		else {
+			finish[nowturn] = 1000 - countturn;
+			Print << U"Player{} 勝ち抜け(ターン{})"_fmt(players[nowturn]->getname(), countturn);
+			if (gamecount != 1 and finish[ranking[0]] == 0) {
+				Print << U"Player{} 都落としにより脱落(ターン{})"_fmt(players[ranking[0]]->getname(), countturn);
+				finish[ranking[0]] = -10;
+			}
+		}
 	}
 	if (events.isyagiri()) {
 		Print << U"Player{} 8切り発動(ターン{})"_fmt(players[nowturn]->getname(), countturn);
@@ -115,6 +122,7 @@ void Gamemastar::progress() {
 		events.restart();
 	}
 	nowturn = nextturn(nowturn);
+	if (isfinish())ranking = setranking(finish);
 }
 bool Gamemastar::isfinish() {
 	return countplayer(0) == 0;
@@ -166,6 +174,23 @@ bool  Gamemastar::usecard(int who, Card card) {
 	if (itr == playercard[who].end())return false;
 	playercard[who].erase(itr);
 	return true;
+}
+Array<int32> Gamemastar::setranking(Array<int32> fin) {
+	int32 hiscore = -9999;
+	int32 pos = 0;
+	Array<int32> ran;
+	for (auto i : step(4)) {
+		hiscore = -9999;
+		for (auto j : step(4)) {
+			if (find(ran.begin(), ran.end(), j) != ran.end())continue;
+			if (fin[j] > hiscore) {
+				hiscore = fin[j];
+				pos = j;
+			}
+		}
+		ran << pos;
+	}
+	return ran;
 }
 int32  Gamemastar::countplayer(int32 c) {
 	int co = 0;

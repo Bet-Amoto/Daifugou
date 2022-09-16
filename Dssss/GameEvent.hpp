@@ -45,6 +45,8 @@ public:
 	//階段になってるか
 	bool iskaidan(Array<Card> cards) const;
 
+	//反則上がりになるカードか
+	bool ishansoku(Array<Card> cards) const;
 	////////////////////////////////////////////////////////////////////////////////////
 
 	GameEvent();
