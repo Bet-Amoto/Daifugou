@@ -63,8 +63,9 @@ void Main()
 	const double cooltime = 0.2;
 
 	//2つめの引数の数字を変えるとlogの量を調整できるよ(0-3) 0はすべてのlog、3はlogなし
-	Gamemastar mastar(players,100);
+	Gamemastar mastar(players,3);
 
+	//爆速モード 超高速で5000ゲーム繰り返す logの設定は3推奨
 	const bool bakusoku = true;
 
 	Window::Resize(1280, 720);
@@ -100,11 +101,13 @@ void Main()
 				gamecount++;
 			}
 			ClearPrint();
-			Print << U"ゲーム数:{}"_fmt(gamecount);
 			if (gamecount > 5000) {
 				Logger << U"Finish!";
 				Print << U"Finish!";
 				Print << logstr;
+			}
+			else {
+				Print << U"ゲーム数:{}"_fmt(gamecount);
 			}
 			continue;
 		}
