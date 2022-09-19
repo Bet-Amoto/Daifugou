@@ -93,7 +93,7 @@ void Gamemastar::progress() {
 		passcount++;
 	}
 	else passcount = 0;
-	if (passcount >= countplayer(0) - 1) {
+	if (passcount >= countplayer() - 1) {
 		events.restart();
 		printlog(U"パスが続いたため場が流れます(ターン{})"_fmt(countturn));
 		passcount = 0;
@@ -126,12 +126,12 @@ void Gamemastar::progress() {
 	if (isfinish())ranking = setranking(finish);
 }
 bool Gamemastar::isfinish() {
-	return countplayer(0) == 0;
+	return countplayer() == 0;
 }
 void Gamemastar::draw() const {
 	Line(900, 0, 900, 720).draw(Palette::Yellowgreen);
 	for (auto p : step(players.size())) {
-		font(players[p]->getname()).drawAt(Vec2(100, 150 * p + 150), p == nowturn ? Palette::Lightpink : Palette::Black);
+		font(players[p]->getname()).drawAt(Vec2(75, 150 * p + 150), p == nowturn ? Palette::Lightpink : Palette::Black);
 	}
 	for (auto p : step(playercard.size())) {
 		for (auto c : step(playercard[p].size())) {
@@ -150,7 +150,7 @@ Array<Player*> Gamemastar::getRanking() {
 	return p;
 }
 int32  Gamemastar::nextturn(int32 n) {
-	if (countplayer(0) == 0)return -1;
+	if (countplayer() == 0)return -1;
 	n = (n + 1) % 4;
 	while (finish[n] != 0)n = (n + 1) % 4;
 	return n;
@@ -199,8 +199,8 @@ void Gamemastar::printlog(String str, int32 logLv) {
 		Logger << str;
 	}
 }
-int32  Gamemastar::countplayer(int32 c) {
+int32  Gamemastar::countplayer() {
 	int co = 0;
-	for (auto f : finish)if (f == c)co++;
+	for (auto f : finish)if (f == 0)co++;
 	return co;
 }

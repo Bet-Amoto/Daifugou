@@ -17,13 +17,19 @@ public:
 	void draw() const;
 	Array<Player*> getRanking();
 private:
+	//次のプレイヤーに進める
 	int32 nextturn(int32 n);
+	//プレイヤーがそのカードを持っているか
 	bool ishave(int who, Array<Card> cards);
 	bool ishave(int who, Card card);
+	//プレイヤーのカードを消去
 	bool usecard(int who, Array<Card> cards);
 	bool usecard(int who, Card card);
+	//ランキングをセット
 	Array<int32> setranking(Array<int32> fin);
-	int32 countplayer(int32 c);
+	//残りのプレイヤーの数
+	int32 countplayer();
+	//ログを表示
 	void printlog(String str,int32 logLv=1);
 	Pack pack;
 	GameEvent events;
@@ -41,5 +47,4 @@ private:
 	Array<int32> finish;
 	int32 loglv;
 	const Array<String> rankname{ U"大富豪",U"富豪", U"貧民", U"大貧民" };
-	//const Array<String> mark{ U"♠",U"♡",U"♢",U"♣",U"J"};
 };
